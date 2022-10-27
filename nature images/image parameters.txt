@@ -1,0 +1,2 @@
+1: start_coord = (0, 353), scale = (1, 1.5)
+2: start_coord = (0, 456), scale = (2, 2)
