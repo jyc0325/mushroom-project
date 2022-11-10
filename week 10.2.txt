@@ -1,4 +1,0 @@
-made program to overlay mushroom image on background image
-
-next objective: add scaling function,
-			then save mushroom coordinate in coco dataset format

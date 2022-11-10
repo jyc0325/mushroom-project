@@ -44,12 +44,13 @@ def create_save_images(n, img1, img2, scale, c1, c2, flip, path):
         obj = shrink(img2, scale[0] * (img1.size[1] / random_coord[1]) ** scale[1])
         # print(obj.size)
 
+        # place img2 (obj) onto img1
         img = place_image(img1, obj, random_coord, flip)
         filename = str(i) + '.jpg'
         img.save(path + '/' + filename)
 
         # create and save dataframe
-        data = [filename, True, img.size[0], img.size[1], random_coord[0], random_coord[1], random_coord[0] + img2.size[0], random_coord[1] + img2.size[1]]
+        data = [filename, "mushroom", img.size[0], img.size[1], random_coord[0], random_coord[1], random_coord[0] + obj.size[0], random_coord[1] + obj.size[1]]
         s = pd.Series(data, index=df.columns)
         df = df.append(s, ignore_index=True)
         df.to_csv('data.csv', index=False)
@@ -122,10 +123,10 @@ if __name__ == "__main__":
     img1 = Image.open(r"./nature images/2.jpg")
     
     # Opening the secondary image (overlay image)
-    img2 = Image.open(r"./mushroom images/22.png")
+    img2 = Image.open(r"./mushroom images/3.png")
 
-    # scale is exponent of (shrink factor, (image size / mushroom y coord))
-    scale = (2, 2)
+    # scale format: (shrink factor, (image size / mushroom y coord))
+    scale = (1.5, 2)
 
     start_coord = (0, 456)
     max_coord = (img1.size[0]-img2.size[0], img1.size[1]-img2.size[1])
@@ -134,7 +135,7 @@ if __name__ == "__main__":
     if not path.exists(output_folder):
         mkdir(output_folder)
 
-    create_save_images(10, img1, img2, scale, start_coord, max_coord, True, output_folder)
+    create_save_images(100, img1, img2, scale, start_coord, max_coord, True, output_folder)
     csv_to_coco("data.csv")
 
     # img = random_place_image(img1, img2, start_coord, max_coord)
