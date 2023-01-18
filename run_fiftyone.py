@@ -1,10 +1,10 @@
 import fiftyone as fo
 
 # The directory containing the source images
-data_path = "./created_images"
+data_path = "./created_images/1-1"
 
 # The path to the COCO labels JSON file
-labels_path = "./cocodata.json"
+labels_path = "./created_images/1-1/cocodata.json"
 
 # Import the dataset
 dataset = fo.Dataset.from_dir(

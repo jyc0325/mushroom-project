@@ -31,13 +31,21 @@ width: width of generated image
 height: height of generated image
 xmin, ymin, xmax, ymax: coordinates for bounding box
 '''
-def create_save_images(n, img1, img2, scale, c1, c2, flip, path):
+def create_save_images(n, mushroom, background, scale, start_coord, flip, path):
     df = pd.DataFrame(columns = ["filename", "class", "width", "height", 'xmin', 'ymin', 'xmax', 'ymax'])
+
+    # Opening background image (used in background)
+    img1 = Image.open("./nature images/" + str(background) + ".jpg")
+    
+    # Opening mushroom image (overlay image)
+    img2 = Image.open("./mushroom images/" + str(mushroom) + ".png")
+
+    max_coord = (img1.size[0]-img2.size[0], img1.size[1]-img2.size[1])
 
     # create and save image
     for i in range(n):
         # random range of coordinates c1 ~ c2
-        random_coord = (random.randint(c1[0], c2[0]), random.randint(c1[1], c2[1]))
+        random_coord = (random.randint(start_coord[0], max_coord[0]), random.randint(start_coord[1], max_coord[1]))
 
         # scale image by y coordinate
         # print(img2.size)
@@ -46,14 +54,14 @@ def create_save_images(n, img1, img2, scale, c1, c2, flip, path):
 
         # place img2 (obj) onto img1
         img = place_image(img1, obj, random_coord, flip)
-        filename = str(i) + '.jpg'
+        filename = str(mushroom) + '-' + str(background) + "_" + str(i) + '.jpg'
         img.save(path + '/' + filename)
 
         # create and save dataframe
         data = [filename, "mushroom", img.size[0], img.size[1], random_coord[0], random_coord[1], random_coord[0] + obj.size[0], random_coord[1] + obj.size[1]]
         s = pd.Series(data, index=df.columns)
         df = df.append(s, ignore_index=True)
-        df.to_csv('data.csv', index=False)
+        df.to_csv(path + '/data.csv', index=False)
 
 # helper functions for creating coco dataset
 def image(row):
@@ -82,7 +90,7 @@ def annotation(row):
     return annotation        
 
 # create coco dataset from csv file with above format
-def csv_to_coco(filename):
+def csv_to_coco(filename, output_folder):
     data = pd.read_csv(filename)
     images = []
     categories = []
@@ -113,30 +121,30 @@ def csv_to_coco(filename):
     data_coco["images"] = images
     data_coco["categories"] = categories
     data_coco["annotations"] = annotations
-    json.dump(data_coco, open("./cocodata.json", "w"), indent=4)
+    json.dump(data_coco, open(output_folder + "/cocodata.json", "w"), indent=4)
 
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    # Opening the primary image (used in background)
-    img1 = Image.open(r"./nature images/2.jpg")
+#     # Opening the primary image (used in background)
+#     img1 = Image.open("./nature images/2.jpg")
     
-    # Opening the secondary image (overlay image)
-    img2 = Image.open(r"./mushroom images/3.png")
+#     # Opening the secondary image (overlay image)
+#     img2 = Image.open("./mushroom images/3.png")
 
-    # scale format: (shrink factor, (image size / mushroom y coord))
-    scale = (1.5, 2)
+#     # scale format: (shrink factor, (image size / mushroom y coord))
+#     scale = (1.5, 2)
 
-    start_coord = (0, 456)
-    max_coord = (img1.size[0]-img2.size[0], img1.size[1]-img2.size[1])
+#     start_coord = (0, 456)
+#     max_coord = (img1.size[0]-img2.size[0], img1.size[1]-img2.size[1])
 
-    output_folder = "./created_images"
-    if not path.exists(output_folder):
-        mkdir(output_folder)
+#     output_folder = "./created_images"
+#     if not path.exists(output_folder):
+#         mkdir(output_folder)
 
-    create_save_images(100, img1, img2, scale, start_coord, max_coord, True, output_folder)
-    csv_to_coco("data.csv")
+#     create_save_images(100, img1, img2, scale, start_coord, max_coord, True, output_folder)
+#     csv_to_coco(output_folder + "/data.csv", output_folder)
 
-    # img = random_place_image(img1, img2, start_coord, max_coord)
-    # img.show()
+#     # img = random_place_image(img1, img2, start_coord, max_coord)
+#     # img.show()
