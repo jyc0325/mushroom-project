@@ -3,3 +3,4 @@ data.csv
 cocodata.json
 created_images/
 progress/
+__pycache__

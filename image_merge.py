@@ -48,9 +48,7 @@ def create_save_images(n, mushroom, background, scale, start_coord, flip, path):
         random_coord = (random.randint(start_coord[0], max_coord[0]), random.randint(start_coord[1], max_coord[1]))
 
         # scale image by y coordinate
-        # print(img2.size)
         obj = shrink(img2, scale[0] * (img1.size[1] / random_coord[1]) ** scale[1])
-        # print(obj.size)
 
         # place img2 (obj) onto img1
         img = place_image(img1, obj, random_coord, flip)
@@ -60,8 +58,13 @@ def create_save_images(n, mushroom, background, scale, start_coord, flip, path):
         # create and save dataframe
         data = [filename, "mushroom", img.size[0], img.size[1], random_coord[0], random_coord[1], random_coord[0] + obj.size[0], random_coord[1] + obj.size[1]]
         s = pd.Series(data, index=df.columns)
+        # df = pd.concat([df, s], ignore_index=True)
         df = df.append(s, ignore_index=True)
-        df.to_csv(path + '/data.csv', index=False)
+
+        # create yolo annotation
+        filename = str(mushroom) + '-' + str(background) + "_" + str(i) + '.txt'
+        create_yolo_ann(path + "_labels", filename, 0, random_coord, obj.size, img.size)
+    return df
 
 # helper functions for creating coco dataset
 def image(row):
@@ -124,6 +127,32 @@ def csv_to_coco(filename, output_folder):
     json.dump(data_coco, open(output_folder + "/cocodata.json", "w"), indent=4)
 
 
+# creates yolo annotations
+def create_yolo_ann(folder_path, filename, class_id, bb_coord, bb_size, img_size):
+
+    x, y = bb_coord
+    w, h = bb_size
+    img_w, img_h = img_size
+
+    # Finding midpoints
+    x_centre = (x + (x+w))/2
+    y_centre = (y + (y+h))/2
+    
+    # Normalization
+    x_centre = x_centre / img_w
+    y_centre = y_centre / img_h
+    w = w / img_w
+    h = h / img_h
+
+    # Limiting upto fix number of decimal places
+    x_centre = format(x_centre, '.6f')
+    y_centre = format(y_centre, '.6f')
+    w = format(w, '.6f')
+    h = format(h, '.6f')
+    
+    ann_file = open(f"{folder_path}/{filename}", "w")
+    ann_file.write(f"0 {x_centre} {y_centre} {w} {h}\n")
+    ann_file.close()
 
 # if __name__ == "__main__":
 

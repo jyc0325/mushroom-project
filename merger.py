@@ -15,16 +15,19 @@ def merge(n, mushroom, background, scale, start_coord, flip):
     output_folder = "./created_images/" + str(mushroom) + "-" + str(background)
     if not path.exists(output_folder):
         mkdir(output_folder)
+    if not path.exists(output_folder + "_labels"):
+        mkdir(output_folder + "_labels")
 
-    create_save_images(n, mushroom, background, scale, start_coord, flip, output_folder)
+    df = create_save_images(n, mushroom, background, scale, start_coord, flip, output_folder)
+    df.to_csv(output_folder + '/data.csv', index=False)
     csv_to_coco(output_folder + "/data.csv", output_folder)
 
 
 
 if __name__ == "__main__":
-    merge(100, 1, 1, (1.5, 2), (0, 353), True)
-    merge(100, 2, 1, (1.5, 2), (0, 353), True)
-    merge(100, 3, 1, (1.5, 2), (0, 353), True)
-    merge(100, 1, 2, (2, 2), (0, 456), True)
-    merge(100, 2, 2, (2, 2), (0, 456), True)
-    merge(100, 3, 2, (2, 2), (0, 456), True)
+    merge(10, 1, 1, (1.5, 2), (0, 353), True)
+    merge(10, 2, 1, (1.5, 2), (0, 353), True)
+    merge(10, 3, 1, (1.5, 2), (0, 353), True)
+    merge(10, 1, 2, (2, 2), (0, 456), True)
+    merge(10, 2, 2, (2, 2), (0, 456), True)
+    merge(10, 3, 2, (2, 2), (0, 456), True)
