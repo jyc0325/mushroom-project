@@ -4,4 +4,5 @@ cocodata.json
 created_images/
 progress/
 data_split/
+yolov5/
 __pycache__
