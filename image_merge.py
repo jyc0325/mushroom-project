@@ -40,6 +40,9 @@ def create_save_images(n, mushroom, background, scale, start_coord, flip, path):
     # Opening mushroom image (overlay image)
     img2 = Image.open("./mushroom images/" + str(mushroom) + ".png")
 
+    # shrink image by absolute scale
+    img2 = shrink(img2, scale[0])
+
     max_coord = (img1.size[0]-img2.size[0], img1.size[1]-img2.size[1])
 
     # create and save image
@@ -48,12 +51,13 @@ def create_save_images(n, mushroom, background, scale, start_coord, flip, path):
         random_coord = (random.randint(start_coord[0], max_coord[0]), random.randint(start_coord[1], max_coord[1]))
 
         # scale image by y coordinate
-        obj = shrink(img2, scale[0] * (img1.size[1] / random_coord[1]) ** scale[1])
+        obj = shrink(img2, (img1.size[1] / random_coord[1]) ** scale[1])
 
         # place img2 (obj) onto img1
         img = place_image(img1, obj, random_coord, flip)
         filename = str(mushroom) + '-' + str(background) + "_" + str(i) + '.jpg'
-        img.save(path + '/' + filename)
+        # img.save(path + '/' + filename)
+        img.save(path + "/images" + '/' + filename)
 
         # create and save dataframe
         data = [filename, "mushroom", img.size[0], img.size[1], random_coord[0], random_coord[1], random_coord[0] + obj.size[0], random_coord[1] + obj.size[1]]
@@ -63,7 +67,7 @@ def create_save_images(n, mushroom, background, scale, start_coord, flip, path):
 
         # create yolo annotation
         filename = str(mushroom) + '-' + str(background) + "_" + str(i) + '.txt'
-        create_yolo_ann(path + "_labels", filename, 0, random_coord, obj.size, img.size)
+        create_yolo_ann(path + "/labels", filename, 0, random_coord, obj.size, img.size)
     return df
 
 # helper functions for creating coco dataset
