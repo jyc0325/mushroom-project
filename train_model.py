@@ -37,7 +37,7 @@ if __name__ == "__main__":
     images.sort()
     annotations.sort()
 
-    # Split the dataset into train-valid-test splits 
+    # Split the dataset into train-valid-test splits (0.8, 0.1, 0.1 ratio)
     train_images, val_images, train_annotations, val_annotations = train_test_split(images, annotations, test_size = 0.2, random_state = 1)
     val_images, test_images, val_annotations, test_annotations = train_test_split(val_images, val_annotations, test_size = 0.5, random_state = 1)
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     create_yaml()
 
     # RUN :
-    # python ./yolov5/train.py  --batch 16 --epochs 5 --data mushroom.yaml --weights yolov5s.pt
+    # python ./yolov5/train.py  --batch 32 --epochs 1000 --data mushroom.yaml --weights yolov5s.pt --device 0
 
     # to check:
     # python ./yolov5/detect.py --weights yolov5/runs/train/exp6/weights/best.pt  --conf 0.4 --source ./data_split/images/train/1-1_0.jpg
