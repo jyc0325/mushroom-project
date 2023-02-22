@@ -5,4 +5,5 @@ created_images/
 progress/
 data_split/
 yolov5/
+train_data_archive/
 __pycache__

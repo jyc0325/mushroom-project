@@ -1,3 +1,6 @@
+# split images into train, test, val
+# create yaml file
+
 from ultralytics import YOLO
 import os
 from os import path, mkdir

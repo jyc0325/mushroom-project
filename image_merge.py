@@ -3,6 +3,7 @@ from os import path, mkdir
 import random
 import json
 import pandas as pd
+import re
 
 # resize image (shrink) by a scale factor s
 def shrink(img, s):
@@ -31,7 +32,7 @@ width: width of generated image
 height: height of generated image
 xmin, ymin, xmax, ymax: coordinates for bounding box
 '''
-def create_save_images(n, mushroom, background, scale, start_coord, flip, path):
+def mush_on_bg(n, mushroom, background, scale, start_coord, flip, path):
     df = pd.DataFrame(columns = ["filename", "class", "width", "height", 'xmin', 'ymin', 'xmax', 'ymax'])
 
     # Opening background image (used in background)
@@ -51,7 +52,7 @@ def create_save_images(n, mushroom, background, scale, start_coord, flip, path):
         random_coord = (random.randint(start_coord[0], max_coord[0]), random.randint(start_coord[1], max_coord[1]))
 
         # scale image by y coordinate
-        obj = shrink(img2, (img1.size[1] / random_coord[1]) ** scale[1])
+        obj = shrink(img2, (img1.size[1] / (random_coord[1] + img2.size[1])) ** scale[1])
 
         # place img2 (obj) onto img1
         img = place_image(img1, obj, random_coord, flip)
@@ -62,13 +63,83 @@ def create_save_images(n, mushroom, background, scale, start_coord, flip, path):
         # create and save dataframe
         data = [filename, "mushroom", img.size[0], img.size[1], random_coord[0], random_coord[1], random_coord[0] + obj.size[0], random_coord[1] + obj.size[1]]
         s = pd.Series(data, index=df.columns)
-        # df = pd.concat([df, s], ignore_index=True)
-        df = df.append(s, ignore_index=True)
+        pd.concat([df, s], ignore_index=True)
 
         # create yolo annotation
         filename = str(mushroom) + '-' + str(background) + "_" + str(i) + '.txt'
         create_yolo_ann(path + "/labels", filename, 0, random_coord, obj.size, img.size)
     return df
+
+
+# add mulitple mushrooms on background image
+# number of mushrooms specifed by dict; key = mushroom number, value = number of mushrooms
+def multiple_mush_on_bg(n, m_dict, background, flip, path):
+
+    bg_par = read_bg_par("./nature images/image parameters.txt")
+    start_coord = eval(bg_par[background][0])
+    scale = eval(bg_par[background][1])
+
+    # Opening background image (used in background)
+    img1 = Image.open("./nature images/" + str(background) + ".jpg")
+    
+    mushroom_images = dict()
+    # Opening mushroom images (overlay image)
+    for mushroom in m_dict:
+        img2 = Image.open("./mushroom images/" + str(mushroom) + ".png")
+
+        # shrink image by absolute scale
+        img2 = shrink(img2, scale[0])
+        mushroom_images[mushroom] = img2
+
+    # get filename of created image / annotation
+    filename = ''
+    for mushroom in m_dict:
+        if filename == '':
+            filename += str(mushroom)
+        else:
+            filename += ',' + str(mushroom)
+
+    # create and save image
+    for i in range(n):
+        img = img1
+        annotation_filename = filename + '-' + str(background) + "_" + str(i) + '.txt'
+        image_filename = filename + '-' + str(background) + "_" + str(i) + '.jpg'
+
+        for mushroom in m_dict:
+            img2 = mushroom_images[mushroom]
+            max_coord = (img1.size[0]-img2.size[0], img1.size[1]-img2.size[1])
+            
+            for i in range(m_dict[mushroom]):    
+                # random range of coordinates c1 ~ c2
+                
+                random_coord = (random.randint(start_coord[0], max_coord[0]), random.randint(start_coord[1], max_coord[1]))
+
+                # scale image by y coordinate
+                obj = shrink(img2, (img1.size[1] / (random_coord[1] + img2.size[1])) ** scale[1])
+
+                # place img2 (obj) onto img1
+                img = place_image(img, obj, random_coord, flip)
+                
+                # create yolo annotation
+                create_yolo_ann(path + "/labels", annotation_filename, 0, random_coord, obj.size, img.size)
+
+
+        img.save(path + "/images" + '/' + image_filename)
+
+
+# returns background images' parameters as a dict
+def read_bg_par(path):
+    # key = mushroom number, value = mushroom's parameters
+    bg_parameters = dict()
+
+    # background parameters
+    file = open(path, 'r')
+    lines = file.readlines()
+    for i, line in enumerate(lines):        
+        bg_parameters[i + 1] = re.findall('\(([^)]+)', line)
+
+    return bg_parameters
+
 
 # helper functions for creating coco dataset
 def image(row):
@@ -154,7 +225,7 @@ def create_yolo_ann(folder_path, filename, class_id, bb_coord, bb_size, img_size
     w = format(w, '.6f')
     h = format(h, '.6f')
     
-    ann_file = open(f"{folder_path}/{filename}", "w")
+    ann_file = open(f"{folder_path}/{filename}", "a")
     ann_file.write(f"0 {x_centre} {y_centre} {w} {h}\n")
     ann_file.close()
 

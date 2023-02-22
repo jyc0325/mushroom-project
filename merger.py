@@ -2,10 +2,9 @@ from image_merge import *
 import shutil
 import os
 
-# merge mushroom image img2 on background image img1 as image file a-b
+# merge mushroom image img2 on background image img1 as image file "img1-img2"
 # n: number of images to create
-
-def merge(n, mushroom, background, scale, start_coord, flip):
+def merge_manual(n, mushroom, background, scale, start_coord, flip):
     # # Opening background image (used in background)
     # img1 = Image.open("./nature images/" + str(b) + ".jpg")
     
@@ -20,9 +19,24 @@ def merge(n, mushroom, background, scale, start_coord, flip):
     if not path.exists(output_folder + "/labels"):
         mkdir(output_folder + "/labels")
 
-    df = create_save_images(n, mushroom, background, scale, start_coord, flip, output_folder)
+    df = mush_on_bg(n, mushroom, background, scale, start_coord, flip, output_folder)
     # df.to_csv(output_folder + '/data.csv', index=False)
     # csv_to_coco(output_folder + "/data.csv", output_folder)
+
+# merge multiple mushrooms onto background
+# number of mushrooms specifed by dict; key = mushroom number, value = number of mushrooms
+def merge(n, m_dict, background, flip):
+    output_folder = "./created_images"
+
+    # output_folder = "./created_images/" + str(mushroom) + "-" + str(background)
+    if not path.exists(output_folder + "/images"):
+        mkdir(output_folder + "/images")
+    if not path.exists(output_folder + "/labels"):
+        mkdir(output_folder + "/labels")
+
+    multiple_mush_on_bg(n, m_dict, background, flip, output_folder)
+    
+
 
 
 def delete_files(folder):
@@ -40,27 +54,9 @@ if __name__ == "__main__":
     # delete contents of folder
     delete_files("./created_images")
 
-    # (number of images, mushroom #, background #)
-    # merge(100, 1, 1, (0.4, 2), (0, 0), True) # (1.5, 2) , (0, 353)
-    # merge(100, 2, 1, (0.4, 2), (0, 0), True)
-    # merge(100, 3, 1, (0.4, 2), (0, 0), True)
-    # merge(100, 4, 1, (0.4, 2), (0, 0), True)
-    # merge(100, 5, 1, (0.4, 2), (0, 0), True)
+    # mushroom number , background number
 
-    # merge(100, 1, 2, (0.3, 2), (0, 0), True)  # (2, 2) , (0, 456)
-    # merge(100, 2, 2, (0.3, 2), (0, 0), True)
-    # merge(100, 3, 2, (0.3, 2), (0, 0), True)
-    # merge(100, 4, 2, (0.3, 2), (0, 0), True)
-    # merge(100, 5, 2, (0.3, 2), (0, 0), True)
+    # merge_manual(100, 3, 2, (2, 2), (150, 720), True)
 
-    merge(100, 1, 1, (1.5, 2), (0, 353), True)
-    merge(100, 2, 1, (1.5, 2), (0, 353), True)
-    merge(100, 3, 1, (1.5, 2), (0, 353), True)
-    merge(100, 4, 1, (1.5, 2), (0, 353), True)
-    merge(100, 5, 1, (1.5, 2), (0, 353), True)
-
-    merge(100, 1, 2, (2, 2), (0, 456), True)
-    merge(100, 2, 2, (2, 2), (0, 456), True)
-    merge(100, 3, 2, (2, 2), (0, 456), True)
-    merge(100, 4, 2, (2, 2), (0, 456), True)
-    merge(100, 5, 2, (2, 2), (0, 456), True)
+    m_dict = {1:1, 2:2, 3:1}
+    merge(100,{1:3, 3:2, 5:4}, 5, True)

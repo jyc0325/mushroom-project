@@ -26,15 +26,19 @@ def plot_bounding_box(image, annotation_list):
     plt.imshow(np.array(image))
     plt.show()
 
-# Get any annotation file 
-annotation_file = "./created_images/labels/3-2_0.txt"
+# part to change
+filename = "1,3,5-5_2"
+#
+
+# Get any annotation file
+annotation_file = "./created_images/labels/" + filename + ".txt"
 with open(annotation_file, "r") as file:
     annotation_list = file.read().split("\n")[:-1]
     annotation_list = [x.split(" ") for x in annotation_list]
     annotation_list = [[float(y) for y in x ] for x in annotation_list]
 
 #Get the corresponding image file
-image_file = "./created_images/images/3-2_0.jpg"
+image_file = "./created_images/images/" + filename + ".jpg"
 
 #Load the image
 image = Image.open(image_file)
