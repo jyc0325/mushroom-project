@@ -94,10 +94,11 @@ def multiple_mush_on_bg(n, m_dict, background, flip, path):
     # get filename of created image / annotation
     filename = ''
     for mushroom in m_dict:
-        if filename == '':
-            filename += str(mushroom)
-        else:
-            filename += ',' + str(mushroom)
+        if m_dict[mushroom] != 0:
+            if filename == '':
+                filename += str(mushroom)
+            else:
+                filename += ',' + str(mushroom)
 
     # create and save image
     for i in range(n):

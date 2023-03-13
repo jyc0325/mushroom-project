@@ -1,6 +1,7 @@
 from image_merge import *
 import shutil
 import os
+import random
 
 # merge mushroom image img2 on background image img1 as image file "img1-img2"
 # n: number of images to create
@@ -26,9 +27,22 @@ def merge_manual(n, mushroom, background, scale, start_coord, flip):
 # merge multiple mushrooms onto background
 # number of mushrooms specifed by dict; key = mushroom number, value = number of mushrooms
 def merge(n, m_dict, background, flip):
-    output_folder = "./created_images"
+    ###
+    # This section makes directories for each background
+    # filename = ''
+    # for mushroom in m_dict:
+    #     if m_dict[mushroom] != 0:
+    #         if filename == '':
+    #             filename += str(mushroom)
+    #         else:
+    #             filename += ',' + str(mushroom)
 
-    # output_folder = "./created_images/" + str(mushroom) + "-" + str(background)
+    # output_folder = "./created_images/" + filename + "-" + str(background)
+    # if not path.exists(output_folder):
+    #     mkdir(output_folder)
+    ###
+
+    output_folder = "./created_images"
     if not path.exists(output_folder + "/images"):
         mkdir(output_folder + "/images")
     if not path.exists(output_folder + "/labels"):
@@ -59,4 +73,10 @@ if __name__ == "__main__":
     # merge_manual(100, 3, 2, (2, 2), (150, 720), True)
 
     m_dict = {1:1, 2:2, 3:1}
-    merge(100,{1:3, 3:2, 5:4}, 5, True)
+
+    for i in range(10):
+        d = dict()
+        for key in range(5):
+            d[key+1] = random.randint(0,2)
+        print(d)
+        merge(250, d, i+1, True)
