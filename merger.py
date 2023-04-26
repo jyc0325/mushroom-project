@@ -72,11 +72,12 @@ if __name__ == "__main__":
 
     # merge_manual(100, 3, 2, (2, 2), (150, 720), True)
 
-    m_dict = {1:1, 2:2, 3:1}
+    # for i in range(10):
+    #     d = dict()
+    #     for key in range(5):
+    #         d[key+1] = random.randint(0,2)
+    #     print(d)
+    #     merge(250, d, i+1, True)
 
     for i in range(10):
-        d = dict()
-        for key in range(5):
-            d[key+1] = random.randint(0,2)
-        print(d)
-        merge(250, d, i+1, True)
+        merge(250, 11, i+1, True)

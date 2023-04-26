@@ -115,4 +115,5 @@ if __name__ == "__main__":
     # python ./yolov5/train.py  --batch -1 --epochs 500 --data mushroom.yaml --weights yolov5s.pt --device 0
 
     # to check:
-    # python ./yolov5/detect.py --weights yolov5/runs/train/exp6/weights/best.pt  --conf 0.4 --source ./data_split/images/train/1-1_0.jpg
+    # python ./yolov5/detect.py --weights yolov5/runs/train/exp11/weights/best.pt  --conf 0.4 --source ./test_images/b1.jpg
+    # python ./yolov5/detect.py --weights yolov5/runs/train/exp11/weights/best.pt  --conf 0.4 --source .\data_split\images\train\1,2,3,4,5-2_0.jpg
