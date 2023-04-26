@@ -80,4 +80,4 @@ if __name__ == "__main__":
     #     merge(250, d, i+1, True)
 
     for i in range(10):
-        merge(250, 11, i+1, True)
+        merge(1000, 11, i+1, True)

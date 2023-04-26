@@ -71,8 +71,8 @@ def mush_on_bg(n, mushroom, background, scale, start_coord, flip, path):
     return df
 
 # add mulitple mushrooms on background image
-# number of mushrooms specifed by dict; key = mushroom number, value = number of mushrooms
-def multiple_mush_on_bg(n, m_dict, background, flip, path):
+# randomly choose 1 mushroom type and add 1- 5 of them
+def multiple_mush_on_bg(n, mushroom_num, background, flip, path):
 
     bg_par = read_bg_par("./nature images/image parameters.txt")
     start_coord = eval(bg_par[background][0])
@@ -83,48 +83,41 @@ def multiple_mush_on_bg(n, m_dict, background, flip, path):
     
     # Opening mushroom images (overlay image)
     mushroom_images = dict()
-    if isinstance(m_dict, int):
-        mushroom = random.randint(1, m_dict)
-        m_dict = {mushroom:random.randint(1, 5)}
+        
     
-    for mushroom in m_dict:
-        img2 = Image.open("./mushroom images/" + str(mushroom) + ".png")
+    for mushroom in range(mushroom_num):
+        img2 = Image.open("./mushroom images/" + str(mushroom + 1) + ".png")
 
         # shrink image by absolute scale
         img2 = shrink(img2, scale[0])
-        mushroom_images[mushroom] = img2
+        mushroom_images[mushroom + 1] = img2
 
-    # get filename of created image / annotation
-    filename = ''
-    for mushroom in m_dict:
-        if filename == '':
-            filename += str(mushroom)
-        else:
-            filename += ',' + str(mushroom)
 
     # create and save image
     for i in range(n):
+        mushroom = random.randint(1, mushroom_num)
         img = img1
+        filename = str(mushroom)
         annotation_filename = filename + '-' + str(background) + "_" + str(i) + '.txt'
         image_filename = filename + '-' + str(background) + "_" + str(i) + '.jpg'
-
-        for mushroom in m_dict:
-            img2 = mushroom_images[mushroom]
-            max_coord = (img1.size[0]-img2.size[0], img1.size[1]-img2.size[1])
+   
+        img2 = mushroom_images[mushroom]
+        max_coord = (img1.size[0]-img2.size[0], img1.size[1]-img2.size[1])
+        
+        # merge 1 - 5 mushrooms
+        for i in range(random.randint(1, 6)):    
+            # random range of coordinates c1 ~ c2
             
-            for i in range(m_dict[mushroom]):    
-                # random range of coordinates c1 ~ c2
-                
-                random_coord = (random.randint(start_coord[0], max_coord[0]), random.randint(start_coord[1], max_coord[1]))
+            random_coord = (random.randint(start_coord[0], max_coord[0]), random.randint(start_coord[1], max_coord[1]))
 
-                # scale image by y coordinate
-                obj = shrink(img2, (img1.size[1] / (random_coord[1] + img2.size[1])) ** scale[1])
+            # scale image by y coordinate
+            obj = shrink(img2, (img1.size[1] / (random_coord[1] + img2.size[1])) ** scale[1])
 
-                # place img2 (obj) onto img1
-                img = place_image(img, obj, random_coord, flip)
-                
-                # create yolo annotation
-                create_yolo_ann(path + "/labels", annotation_filename, 0, random_coord, obj.size, img.size)
+            # place img2 (obj) onto img1
+            img = place_image(img, obj, random_coord, flip)
+            
+            # create yolo annotation
+            create_yolo_ann(path + "/labels", annotation_filename, 0, random_coord, obj.size, img.size)
 
 
         img.save(path + "/images" + '/' + image_filename)
